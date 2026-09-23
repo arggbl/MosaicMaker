@@ -2,6 +2,7 @@
 from PIL import Image
 import os
 from math import ceil
+from tqdm import tqdm
 
 scale = 5 #How scaled up an image should be [larger val = larger image]
 
@@ -66,11 +67,10 @@ for TileName in TileNames:
     
 # do some math for the tile parameters and create a grid
 TileWidth, TileHeight = InputWidth/GridSize, InputHeight/GridSize
-ProgressBar = ["[          ]", "[■         ]", "[■■        ]", "[■■■       ]", "[■■■■      ]", "[■■■■■     ]", "[■■■■■■    ]", "[■■■■■■■   ]", "[■■■■■■■■  ]", "[■■■■■■■■■ ]","[■■■■■■■■■■]"]
 
 OUTPUT = Image.new(mode="RGB", size=(InputWidth * scale, InputHeight * scale))
 # iterate through X and Y to find which image to place in each section of the grid
-for CellX in range(0,GridSize):
+for CellX in tqdm(range(0,GridSize)):
     for CellY in range(0,GridSize):
         # crop out a section
         CroppedCell = InputImage.crop([CellX*TileWidth, CellY*TileHeight, (CellX+1)*TileWidth, (CellY+1)*TileHeight])
@@ -82,12 +82,10 @@ for CellX in range(0,GridSize):
         resize = closestImg.resize((ceil(TileWidth * scale),ceil(TileHeight * scale)),Image.LANCZOS)
         # paste the image in
         Image.Image.paste(OUTPUT, resize, (ceil(CellX*TileWidth * scale), ceil(CellY*TileHeight * scale)))
-        
-    print(ProgressBar[ceil(CellX // (GridSize / 10))], end = " ")
-    print(f"{int(CellX / GridSize * 100)}%")
 
 number = len(os.listdir("Output"))
 OUTPUT.save(f"Output\\{number}.png")
 final = Image.open(f"Output\\{number}.png")
 final.show()
-print("FINISHED")
+print("\nFINISHED")
+input("press enter to exit")
